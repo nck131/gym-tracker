@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <title>Gym Tracker — Cycle 1</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111;
+            color: #e0e0e0;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 70px
+        }
+
+        .header {
+            background: #1a1a2e;
+            padding: 14px 16px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #2a2a3e
+        }
+
+        .header h1 {
+            font-size: 18px;
+            color: #fff
+        }
+
+        .header .sub {
+            font-size: 12px;
+            color: #888;
+            margin-top: 2px
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background: #111;
+            border-bottom: 1px solid #222;
+            position: sticky;
+            top: 54px;
+            z-index: 99
+        }
+
+        .tab {
+            flex: none;
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #888;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .tab.active {
+            color: #e94560;
+            border-bottom-color: #e94560
+        }
+
+        .tab.deload.active {
+            color: #4caf50;
+            border-bottom-color: #4caf50
+        }
+
+        .section {
+            padding: 12px 16px
+        }
+
+        .day-header {
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin: 8px 0 6px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .day-header .day-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff
+        }
+
+        .day-header .day-muscle {
+            font-size: 11px;
+            color: #e94560;
+            margin-top: 2px
+        }
+
+        .day-header .arrow {
+            font-size: 18px;
+            color: #666;
+            transition: transform .2s
+        }
+
+        .day-header.open .arrow {
+            transform: rotate(90deg)
+        }
+
+        .day-content {
+            display: none;
+            animation: fadeIn .2s
+        }
+
+        .day-content.show {
+            display: block
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        .exercise {
+            background: #181828;
+            border: 1px solid #2a2a3e;
+            border-radius: 10px;
+            padding: 10px 12px;
+            margin: 6px 0
+        }
+
+        .ex-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px
+        }
+
+        .ex-prescription {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 6px
+        }
+
+        .ex-note {
+            font-size: 11px;
+            color: #e94560;
+            font-style: italic;
+            margin-bottom: 6px
+        }
+
+        .sets-table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        .sets-table th {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            padding: 3px 4px;
+            font-weight: 500
+        }
+
+        .sets-table td {
+            text-align: center;
+            padding: 3px 4px
+        }
+
+        .sets-table input {
+            width: 100%;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            padding: 6px 4px;
+            text-align: center;
+            -webkit-appearance: none
+        }
+
+        .sets-table input:focus {
+            border-color: #e94560;
+            outline: none
+        }
+
+        .sets-table input[data-filled="true"] {
+            background: #1a2a1a;
+            border-color: #3a5a3a;
+            color: #4caf50
+        }
+
+        .timer-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            border-top: 1px solid #2a2a3e;
+            padding: 10px 16px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .timer-display {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            font-variant-numeric: tabular-nums;
+            min-width: 50px
+        }
+
+        .timer-label {
+            font-size: 11px;
+            color: #888
+        }
+
+        .timer-bar .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer
+        }
+
+        .btn-start {
+            background: #e94560;
+            color: #fff
+        }
+
+        .btn-start.running {
+            background: #4caf50
+        }
+
+        .progress-section {
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin: 8px 0
+        }
+
+        .progress-label {
+            font-size: 11px;
+            color: #888;
+            margin-bottom: 4px
+        }
+
+        .progress-track {
+            background: #333;
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #ff6b6b);
+            border-radius: 3px;
+            transition: width .3s
+        }
+
+        .progress-text {
+            font-size: 11px;
+            color: #666;
+            margin-top: 3px;
+            text-align: right
+        }
+
+        .notes-area {
+            width: 100%;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 8px;
+            color: #ccc;
+            font-size: 12px;
+            padding: 8px;
+            margin-top: 6px;
+            resize: vertical;
+            min-height: 60px;
+            -webkit-appearance: none
+        }
+
+        .notes-area:focus {
+            border-color: #e94560;
+            outline: none
+        }
+
+        .weight-card {
+            background: #181828;
+            border: 1px solid #2a2a3e;
+            border-radius: 10px;
+            padding: 12px;
+            margin: 6px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+
+        .weight-card label {
+            font-size: 12px;
+            color: #aaa
+        }
+
+        .weight-card input {
+            width: 80px;
+            background: #222;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+            padding: 6px 8px;
+            text-align: center;
+            -webkit-appearance: none
+        }
+
+        .weight-card input:focus {
+            border-color: #e94560;
+            outline: none
+        }
+
+        .save-indicator {
+            position: fixed;
+            top: 54px;
+            right: 16px;
+            background: #4caf50;
+            color: #fff;
+            font-size: 11px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            z-index: 200;
+            opacity: 0;
+            transition: opacity .3s
+        }
+
+        .save-indicator.show {
+            opacity: 1
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>🏋️ Cycle 1 — Gym Tracker</h1>
+        <div class="sub">May 19 – Jun 28, 2026</div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div class="save-indicator" id="saveIndicator">✓ Saved</div>
+    <div id="content"></div>
+
+    <div class="timer-bar">
+        <div>
+            <div class="timer-label">REST TIMER</div>
+            <div class="timer-display" id="timerDisplay">0:00</div>
+        </div>
+        <button class="btn btn-start" id="timerBtn" onclick="toggleTimer()">▶ 90s</button>
+        <button class="btn" style="background:#333;color:#aaa" onclick="resetTimer()">Reset</button>
+    </div>
+
+    <script>
+        const WEEKS = [
+            {
+                num: 1, dates: "May 19–24", goal: "Baseline — Learn weights, hit bottom of rep ranges", deload: false,
+                days: [
+                    {
+                        title: "A — Upper Push + Quad", muscle: "Chest, Shoulders, Triceps, Quads", exercises: [
+                            { name: "Incline Dumbbell Press", sets: 3, reps: "6–10", weight: "12kg", prescription: "Controlled down, pause 1s bottom, explosive up", notes: "Warm up with 2 light sets first. Back flat on bench, slight arch OK. Dumbbells come together at top." },
+                            { name: "Flat Machine Chest Press", sets: 3, reps: "8–12", weight: "start light", prescription: "Slow eccentric (3s), pause, push", notes: "If no machine, do flat dumbbell press. Feet flat, back against pad." },
+                            { name: "Overhead Press (DB or Barbell)", sets: 3, reps: "6–10", weight: "start light", prescription: "Strict — no leg drive, control the negative", notes: "Keep core tight, don't lean back excessively. Bar/DB path stays close to face." },
+                            { name: "Lateral Raises", sets: 3, reps: "10–15", weight: "5kg", prescription: "Slow, controlled — feel the burn in delts", notes: "Slight forward lean. Lead with elbow, not wrist. Don't swing." },
+                            { name: "Tricep Dips or Pushdowns", sets: 3, reps: "8–12", weight: "bodyweight/medium", prescription: "Full lockout at top, controlled descent", notes: "Leaning forward = more chest. Upright = more triceps. Stay upright." },
+                            { name: "Leg Extensions", sets: 3, reps: "10–15", weight: "start light", prescription: "Squeeze and hold at top for 1s", notes: "Don't slam weight down. Control the eccentric." },
+                            { name: "Squats (Goblet or Barbell)", sets: 3, reps: "8–12", weight: "start light", prescription: "Ass to grass if mobility allows. Pause 1s at bottom.", notes: "Start with goblet squat to learn pattern. Weight in heels, knees track toes, chest up." }
+                        ]
+                    },
+                    {
+                        title: "B — Pull + Hams", muscle: "Back, Biceps, Rear Delts, Hamstrings", exercises: [
+                            { name: "Lat Pulldowns (or Assisted Pull-ups)", sets: 3, reps: "6–10", weight: "start light", prescription: "Drive elbows down and back, squeeze lats at bottom", notes: "Slight lean back. Pull to upper chest. Don't yank with arms — initiate with lats." },
+                            { name: "Seated Cable Row", sets: 3, reps: "8–12", weight: "start light", prescription: "Chest up, pull to belly, squeeze 2s", notes: "Sit tall, slight forward lean at start. Full stretch forward, full contraction back." },
+                            { name: "Dumbbell Rows (Single Arm)", sets: 3, reps: "8–12/arm", weight: "10kg", prescription: "Slow negative, pull to hip, squeeze at top", notes: "Flat back, knee on bench. Pull hip-ward, not shoulder-ward. Don't rotate torso." },
+                            { name: "Face Pulls (Cable or Band)", sets: 3, reps: "12–20", weight: "light", prescription: "Pull to forehead, externally rotate, hold 2s", notes: "Lifesaver for shoulder health. Light weight, high reps, perfect form. Rope attachment." },
+                            { name: "Barbell Curls", sets: 3, reps: "8–12", weight: "start light", prescription: "Strict form — no swinging. Slow negative.", notes: "Elbows pinned at sides. If you have to swing, it's too heavy." },
+                            { name: "Leg Curls (Seated or Lying)", sets: 3, reps: "10–15", weight: "start light", prescription: "Squeeze hamstrings at peak, slow return", notes: "Don't lift hips off pad. Point toes slightly." },
+                            { name: "Romanian Deadlifts (DB or BB)", sets: 3, reps: "8–12", weight: "start light", prescription: "Slow descent, feel hamstring stretch, drive hips forward", notes: "Soft knees, NOT straight legs. Hinge at hips, not lower back. Weight stays close to body." },
+                            { name: "Calf Raises", sets: 3, reps: "12–20", weight: "bodyweight", prescription: "Pause 2s at top, full stretch at bottom", notes: "Do on a step for full range. No bouncing." }
+                        ]
+                    },
+                    {
+                        title: "C — Upper Push + Quad (Repeat)", muscle: "Chest, Shoulders, Triceps, Quads", exercises: [
+                            { name: "Incline Dumbbell Press", sets: 3, reps: "6–10", weight: "12kg", prescription: "Controlled down, pause 1s bottom, explosive up", notes: "Try to match or beat Week 1 Day A performance." },
+                            { name: "Flat Machine Chest Press", sets: 3, reps: "8–12", weight: "same as Day A", prescription: "Slow eccentric (3s), pause, push", notes: "Push for more reps than Day A." },
+                            { name: "Overhead Press (DB or Barbell)", sets: 3, reps: "6–10", weight: "same as Day A", prescription: "Strict — no leg drive, control the negative", notes: "Same weight, try for more reps." },
+                            { name: "Lateral Raises", sets: 3, reps: "10–15", weight: "5kg", prescription: "Slow, controlled", notes: "Same or slightly more reps than Day A." },
+                            { name: "Tricep Dips or Pushdowns", sets: 3, reps: "8–12", weight: "bodyweight/medium", prescription: "Full lockout at top", notes: "Push for top of rep range." },
+                            { name: "Leg Extensions", sets: 3, reps: "10–15", weight: "same as Day A", prescription: "Squeeze and hold at top for 1s", notes: "Match or beat Day A." },
+                            { name: "Squats (Goblet or Barbell)", sets: 3, reps: "8–12", weight: "same as Day A", prescription: "Same form cues", notes: "Same weight, push for more reps." }
+                        ]
+                    },
+                    {
+                        title: "D — Pull + Hams (Repeat)", muscle: "Back, Biceps, Rear Delts, Hamstrings", exercises: [
+                            { name: "Lat Pulldowns (or Assisted Pull-ups)", sets: 3, reps: "6–10", weight: "same as Day B", prescription: "Drive elbows down and back", notes: "Same weight, push for more reps." },
+                            { name: "Seated Cable Row", sets: 3, reps: "8–12", weight: "same as Day B", prescription: "Chest up, pull to belly, squeeze 2s", notes: "Same weight, push for more reps." },
+                            { name: "Dumbbell Rows (Single Arm)", sets: 3, reps: "8–12/arm", weight: "same as Day B", prescription: "Slow negative, pull to hip", notes: "Same weight, push for more reps." },
+                            { name: "Face Pulls (Cable or Band)", sets: 3, reps: "12–20", weight: "light", prescription: "Pull to forehead, hold 2s", notes: "Same as Day B." },
+                            { name: "Barbell Curls", sets: 3, reps: "8–12", weight: "same as Day B", prescription: "Strict form", notes: "Same weight, push for more reps." },
+                            { name: "Leg Curls (Seated or Lying)", sets: 3, reps: "10–15", weight: "same as Day B", prescription: "Squeeze hamstrings at peak", notes: "Same weight, push for more reps." },
+                            { name: "Romanian Deadlifts (DB or BB)", sets: 3, reps: "8–12", weight: "same as Day B", prescription: "Slow descent, feel hamstring stretch", notes: "Same weight, push for more reps." },
+                            { name: "Calf Raises", sets: 3, reps: "12–20", weight: "bodyweight", prescription: "Pause 2s at top, full stretch at bottom", notes: "Same as Day B." }
+                        ]
+                    }
+                ]
+            },
+            {
+                num: 2, dates: "May 26–31", goal: "Push reps toward top of range", deload: false,
+                days: null
+            },
+            {
+                num: 3, dates: "Jun 2–7", goal: "Increase weight — reset reps to bottom", deload: false,
+                days: null
+            },
+            {
+                num: 4, dates: "Jun 9–14", goal: "Push reps again on new weight", deload: false,
+                days: null
+            },
+            {
+                num: 5, dates: "Jun 16–21", goal: "Last hard week — push for top reps", deload: false,
+                days: null
+            },
+            {
+                num: 6, dates: "Jun 23–28", goal: "60% weight — recover & prepare for Cycle 2", deload: true,
+                days: null
+            }
+        ];
+
+        // Generate weeks 2-6 from week 1 template
+        for (let w = 1; w < WEEKS.length; w++) {
+            if (!WEEKS[w].days) {
+                WEEKS[w].days = JSON.parse(JSON.stringify(WEEKS[0].days));
+                // Update prescriptions for progression
+                if (w === 1) {
+                    WEEKS[w].days.forEach(d => {
+                        d.exercises.forEach(e => {
+                            e.notes = "Same weight as Week 1. Push for TOP of rep range this week.";
+                        });
+                    });
+                } else if (w === 2) {
+                    WEEKS[w].days.forEach(d => {
+                        d.title = d.title.replace(/\(Repeat\)/, '(New Weight)').replace(/—.*?—/, '— Upper Push + Quad —');
+                        d.exercises.forEach(e => {
+                            e.notes = "Increase weight by ~2kg upper / ~5kg lower. Reset to BOTTOM of rep range.";
+                        });
+                    });
+                } else if (w === 3) {
+                    WEEKS[w].days.forEach(d => {
+                        d.exercises.forEach(e => {
+                            e.notes = "Same weight as Week 3. Push for TOP of rep range again.";
+                        });
+                    });
+                } else if (w === 4) {
+                    WEEKS[w].days.forEach(d => {
+                        d.exercises.forEach(e => {
+                            e.notes = "Last hard week. Push for TOP reps or even slight overshoot.";
+                        });
+                    });
+                } else if (w === 5) {
+                    WEEKS[w].days.forEach(d => {
+                        d.exercises.forEach(e => {
+                            e.weight = "60%";
+                            e.reps = "8–12";
+                            e.notes = "DELOAD: ~60% of normal weight. Focus on form, tempo, mind-muscle connection.";
+                            e.prescription = "Slow and controlled. No grinding. Leave 4+ reps in reserve.";
+                        });
+                    });
+                }
+            }
+        }
+
+        const STORAGE_KEY = 'gym_tracker_v2';
+        let data = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        let currentWeek = 0;
+        let timerInterval = null;
+        let timerSeconds = 0;
+        let timerRunning = false;
+
+        function save() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            const el = document.getElementById('saveIndicator');
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1200);
+        }
+
+        function getVal(key) { return data[key] || ''; }
+        function setVal(key, val) { data[key] = val; save(); }
+
+        function buildTabs() {
+            const container = document.getElementById('tabs');
+            container.innerHTML = '';
+            WEEKS.forEach((w, i) => {
+                const tab = document.createElement('div');
+                tab.className = 'tab' + (w.deload ? ' deload' : '') + (i === currentWeek ? ' active' : '');
+                tab.textContent = 'W' + w.num;
+                tab.onclick = () => { currentWeek = i; render(); };
+                container.appendChild(tab);
+            });
+        }
+
+        function render() {
+            buildTabs();
+            const week = WEEKS[currentWeek];
+            const container = document.getElementById('content');
+            let html = `<div class="section">
+    <div class="progress-section">
+      <div class="progress-label">Week ${week.num} of 6 — ${week.goal}</div>
+      <div class="progress-track"><div class="progress-fill" style="width:${Math.round((week.num / 6) * 100)}%"></div></div>
+      <div class="progress-text">${week.dates}</div>
+    </div>
+    <div class="weight-card">
+      <label>Bodyweight (kg)</label>
+      <input type="number" step="0.1" placeholder="—" value="${getVal('bw_w' + week.num)}" onchange="setVal('bw_w'+week.num, this.value)">
+    </div>`;
+
+            week.days.forEach((day, di) => {
+                const dayKey = `w${week.num}_d${di}`;
+                html += `<div class="day-header" onclick="toggleDay(this, '${dayKey}_content')">
+      <div><div class="day-title">${day.title}</div><div class="day-muscle">${day.muscle}</div></div>
+      <div class="arrow">›</div>
+    </div>
+    <div class="day-content" id="${dayKey}_content">`;
+
+                day.exercises.forEach((ex, ei) => {
+                    const exKey = dayKey + `_e${ei}`;
+                    html += `<div class="exercise">
+        <div class="ex-name">${ex.name}</div>
+        <div class="ex-prescription">${ex.sets} sets × ${ex.reps} @ ${ex.weight} · ${ex.prescription}</div>
+        ${ex.notes ? '<div class="ex-note">💡 ' + ex.notes + '</div>' : ''}
+        <table class="sets-table">
+          <tr><th>Set</th><th>Weight</th><th>Reps</th><th>RPE</th></tr>`;
+                    for (let s = 0; s < ex.sets; s++) {
+                        const sk = exKey + `_s${s}`;
+                        const wVal = getVal(sk + 'w');
+                        const rVal = getVal(sk + 'r');
+                        const fVal = getVal(sk + 'f');
+                        html += `<tr>
+          <td style="color:#666;font-size:12px">${s + 1}</td>
+          <td><input type="text" inputmode="decimal" placeholder="kg" value="${wVal}" data-filled="${wVal ? 'true' : 'false'}" onfocus="this.select()" oninput="setVal('${sk}w',this.value);this.dataset.filled=this.value?'true':'false'"></td>
+          <td><input type="text" inputmode="numeric" placeholder="—" value="${rVal}" data-filled="${rVal ? 'true' : 'false'}" onfocus="this.select()" oninput="setVal('${sk}r',this.value);this.dataset.filled=this.value?'true':'false'"></td>
+          <td><input type="text" inputmode="decimal" placeholder="—" value="${fVal}" data-filled="${fVal ? 'true' : 'false'}" onfocus="this.select()" oninput="setVal('${sk}f',this.value);this.dataset.filled=this.value?'true':'false'"></td>
+        </tr>`;
+                    }
+                    html += `</table>
+        <textarea class="notes-area" placeholder="Notes for this exercise..." oninput="setVal('${exKey}_notes', this.value)">${getVal(exKey + '_notes')}</textarea>
+      </div>`;
+                });
+
+                html += `<textarea class="notes-area" placeholder="Day ${di + 1} general notes..." oninput="setVal('${dayKey}_daynotes', this.value)" style="margin:6px 0">${getVal(dayKey + '_daynotes')}</textarea>`;
+                html += `</div>`;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        function toggleDay(header, contentId) {
+            const content = document.getElementById(contentId);
+            header.classList.toggle('open');
+            content.classList.toggle('show');
+        }
+
+        // Timer
+        const TIMER_DURATION = 90;
+        function toggleTimer() {
+            const btn = document.getElementById('timerBtn');
+            if (timerRunning) {
+                clearInterval(timerInterval);
+                timerRunning = false;
+                btn.textContent = '▶ ' + timerSeconds + 's';
+                btn.classList.remove('running');
+            } else {
+                if (timerSeconds <= 0) timerSeconds = TIMER_DURATION;
+                timerRunning = true;
+                btn.textContent = '⏸ Pause';
+                btn.classList.add('running');
+                timerInterval = setInterval(() => {
+                    timerSeconds--;
+                    document.getElementById('timerDisplay').textContent = formatTime(timerSeconds);
+                    if (timerSeconds <= 0) {
+                        clearInterval(timerInterval);
+                        timerRunning = false;
+                        btn.textContent = '▶ 90s';
+                        btn.classList.remove('running');
+                        // Vibrate if supported
+                        if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+                    }
+                }, 1000);
+            }
+        }
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            timerSeconds = TIMER_DURATION;
+            document.getElementById('timerDisplay').textContent = formatTime(TIMER_DURATION);
+            const btn = document.getElementById('timerBtn');
+            btn.textContent = '▶ 90s';
+            btn.classList.remove('running');
+        }
+        function formatTime(s) {
+            const m = Math.floor(s / 60);
+            const sec = s % 60;
+            return m + ':' + (sec < 10 ? '0' : '') + sec;
+        }
+
+        // Prevent double-tap zoom
+        document.addEventListener('dblclick', e => e.preventDefault());
+
+        // Init
+        document.getElementById('timerDisplay').textContent = formatTime(TIMER_DURATION);
+        render();
+    </script>
+</body>
+
+</html>
