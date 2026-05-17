@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Week 1 — May 19–24</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #111;
+            color: #e0e0e0;
+            max-width: 420px;
+            margin: 0 auto;
+            padding: 0 0 80px 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: #1a1a2e;
+            border-bottom: 2px solid #e94560;
+            padding: 12px 16px;
+            text-align: center;
+        }
+
+        .top-bar h1 {
+            font-size: 18px;
+            color: #fff;
+        }
+
+        .top-bar .sub {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .banner {
+            background: #1a3a1a;
+            border-left: 4px solid #4caf50;
+            margin: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .banner strong {
+            color: #81c784;
+        }
+
+        .day-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            position: sticky;
+            top: 62px;
+            z-index: 99;
+            background: #111;
+        }
+
+        .day-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 4px;
+            background: #222;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .day-tab.active {
+            background: #e94560;
+            color: #fff;
+            border-color: #e94560;
+        }
+
+        .day-tab .day-name {
+            display: block;
+            font-size: 11px;
+            opacity: 0.7;
+        }
+
+        .workout {
+            display: none;
+            padding: 0 12px;
+        }
+
+        .workout.active {
+            display: block;
+        }
+
+        .exercise-card {
+            background: #1a1a2e;
+            border-radius: 12px;
+            margin: 8px 0;
+            overflow: hidden;
+            border: 1px solid #2a2a3e;
+        }
+
+        .exercise-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .exercise-header .left {
+            flex: 1;
+        }
+
+        .exercise-header .num {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            background: #e94560;
+            color: #fff;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: 700;
+            margin-right: 10px;
+            flex-shrink: 0;
+        }
+
+        .exercise-header .name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .exercise-header .meta {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 2px;
+        }
+
+        .exercise-header .new-badge {
+            background: #ff9800;
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
+        .exercise-header .toggle {
+            font-size: 20px;
+            color: #666;
+            transition: transform 0.2s;
+            margin-left: 8px;
+        }
+
+        .exercise-card.open .toggle {
+            transform: rotate(180deg);
+        }
+
+        .exercise-body {
+            display: none;
+            padding: 0 16px 16px;
+            border-top: 1px solid #2a2a3e;
+        }
+
+        .exercise-card.open .exercise-body {
+            display: block;
+        }
+
+        .set-table {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .set-table th {
+            font-size: 11px;
+            color: #888;
+            text-align: left;
+            padding: 4px 0 8px;
+            font-weight: 500;
+        }
+
+        .set-table td {
+            padding: 4px 0;
+        }
+
+        .set-table .set-num {
+            font-size: 12px;
+            color: #e94560;
+            font-weight: 700;
+            width: 30px;
+        }
+
+        .set-table input[type="number"] {
+            width: 60px;
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 16px;
+            text-align: center;
+            -webkit-appearance: none;
+        }
+
+        .set-table input[type="number"]:focus {
+            border-color: #e94560;
+            outline: none;
+        }
+
+        .set-table .weight-input {
+            width: 70px;
+        }
+
+        .check-col {
+            width: 40px;
+            text-align: center;
+        }
+
+        .check-col input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #4caf50;
+            cursor: pointer;
+        }
+
+        .exercise-note {
+            font-size: 12px;
+            color: #888;
+            margin-top: 10px;
+            padding: 8px;
+            background: #16213e;
+            border-radius: 6px;
+            line-height: 1.4;
+        }
+
+        .drop-set-box {
+            margin-top: 10px;
+            padding: 10px;
+            background: #2a1a1a;
+            border-radius: 8px;
+            border: 1px dashed #e94560;
+        }
+
+        .drop-set-box .label {
+            font-size: 12px;
+            color: #e94560;
+            font-weight: 700;
+        }
+
+        .drop-set-box input {
+            width: 60px;
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 16px;
+            text-align: center;
+            margin: 6px 4px 0 0;
+            -webkit-appearance: none;
+        }
+
+        .warmup-box {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 14px;
+            margin: 8px 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .warmup-box .title {
+            font-weight: 700;
+            color: #64b5f6;
+            margin-bottom: 4px;
+        }
+
+        .zone2-box {
+            background: #1a2a1a;
+            border-radius: 10px;
+            padding: 14px;
+            margin: 8px 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .zone2-box .title {
+            font-weight: 700;
+            color: #81c784;
+            margin-bottom: 4px;
+        }
+
+        .notes-box {
+            margin: 12px 0;
+            padding: 12px;
+            background: #1a1a2e;
+            border-radius: 10px;
+        }
+
+        .notes-box label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #aaa;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .notes-box textarea {
+            width: 100%;
+            background: #222;
+            border: 1px solid #333;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+            -webkit-appearance: none;
+        }
+
+        .notes-box textarea:focus {
+            border-color: #e94560;
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-bar">
+        <h1>🏋️ WEEK 1 — May 19–24</h1>
+        <div class="sub">Ramp-Up Phase · New exercises marked ⭐</div>
+    </div>
+
+    <div class="banner">
+        <strong>📌 This Week:</strong> Learn new exercises with LIGHT weights. Nail form before adding load. Zone 2
+        starts at 20 min (train) / 30 min (rest). All exercises at <strong>bottom of rep range</strong>.
+    </div>
+
+    <div class="day-tabs">
+        <div class="day-tab active" onclick="switchDay('tue')"><span class="day-name">TUE</span>A</div>
+        <div class="day-tab" onclick="switchDay('thu')"><span class="day-name">THU</span>B</div>
+        <div class="day-tab" onclick="switchDay('sat')"><span class="day-name">SAT</span>C</div>
+    </div>
+
+    <!-- ==================== TUESDAY A ==================== -->
+    <div class="workout active" id="day-tue">
+
+        <div class="warmup-box">
+            <div class="title">🔥 WARM-UP (do every session)</div>
+            • 5 min light cardio (bike/walk)<br>
+            • 2 × 15 band curls / band pushdowns<br>
+            • 1–2 warm-up sets on first exercise (50% → 70%)
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">1</span>
+                <div class="left">
+                    <div class="name">Seated Smith Shoulder Press</div>
+                    <div class="meta">4 × 8 · Rest 2–3 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Heavy compound. Progressive overload priority. Controlled tempo.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">2</span>
+                <div class="left">
+                    <div class="name">Barbell Bent-Over Row <span class="new-badge">⭐ NEW</span></div>
+                    <div class="meta">4 × 8 · Rest 2–3 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Overhand grip, controlled eccentric. Squeeze shoulder blades at top. Start
+                    LIGHT — form first.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">3</span>
+                <div class="left">
+                    <div class="name">Barbell Back Squat</div>
+                    <div class="meta">3 × 8 · Rest 2–3 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Drive through heels, full depth (at least parallel).</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">4</span>
+                <div class="left">
+                    <div class="name">Lateral DB Raise</div>
+                    <div class="meta">4 × 12 · Rest 60s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Controlled tempo. 1 drop set on last set only.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+                <div class="drop-set-box">
+                    <div class="label">🔽 DROP SET (last set only)</div>
+                    <input type="number" inputmode="decimal" placeholder="weight"> → <input type="number"
+                        inputmode="decimal" placeholder="lighter">
+                    <div style="margin-top:4px"><input type="number" inputmode="numeric" placeholder="reps"
+                            style="width:60px;background:#222;border:1px solid #333;color:#fff;border-radius:6px;padding:8px;font-size:16px;text-align:center;-webkit-appearance:none;">
+                        reps</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">5</span>
+                <div class="left">
+                    <div class="name">Barbell Curl</div>
+                    <div class="meta">3 × 10 · Rest 90s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Keep elbows pinned to sides. No swinging.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">6</span>
+                <div class="left">
+                    <div class="name">Tricep Rope Pushdown</div>
+                    <div class="meta">3 × 12 · Rest 90s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Squeeze at bottom, split the rope apart.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">7</span>
+                <div class="left">
+                    <div class="name">Face Pulls</div>
+                    <div class="meta">3 × 15 · Rest 60s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Pull to forehead, squeeze rear delts. Light weight, feel the muscle.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="15"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="15"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="15"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="zone2-box">
+            <div class="title">🫀 ZONE 2 — 20 min</div>
+            Start within 5–10 min of last set. 133–151 bpm. Bike, incline walk, or elliptical.<br>
+            <strong>Test:</strong> Can hold a conversation but not sing.
+        </div>
+
+        <div class="notes-box">
+            <label>📝 Session Notes</label>
+            <textarea placeholder="Energy, sleep, elbow feel, anything unusual..."></textarea>
+        </div>
+
+    </div><!-- /tue -->
+
+    <!-- ==================== THURSDAY B ==================== -->
+    <div class="workout" id="day-thu">
+
+        <div class="warmup-box">
+            <div class="title">🔥 WARM-UP (do every session)</div>
+            • 5 min light cardio (bike/walk)<br>
+            • 2 × 15 band curls / band pushdowns<br>
+            • 1–2 warm-up sets on first exercise (50% → 70%)
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">1</span>
+                <div class="left">
+                    <div class="name">Barbell Bench Press</div>
+                    <div class="meta">4 × 6 · Rest 3 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Heavy compound. Arch back, retract scapula. Full ROM.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="6"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="6"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="6"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="6"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">2</span>
+                <div class="left">
+                    <div class="name">Leg Press (close stance)</div>
+                    <div class="meta">4 × 10 · Rest 2 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Feet low and close = quad emphasis. Full depth, don't lock knees.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">3</span>
+                <div class="left">
+                    <div class="name">Lat Pulldown <span class="new-badge">⭐ NEW</span></div>
+                    <div class="meta">4 × 10 · Rest 2 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Pull to upper chest, squeeze lats at bottom. Start LIGHT — form first.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">4</span>
+                <div class="left">
+                    <div class="name">Romanian Deadlift</div>
+                    <div class="meta">3 × 8 · Rest 2 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Hinge at hips, slight knee bend. Feel the hamstring stretch at bottom.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="8"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">5</span>
+                <div class="left">
+                    <div class="name">Lying Hamstring Curl</div>
+                    <div class="meta">3 × 10 · Rest 90s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Control the negative (3 sec lowering).</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">6</span>
+                <div class="left">
+                    <div class="name">Lateral Cable Raise</div>
+                    <div class="meta">3 × 12 · Rest 60s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Lean away from cable for better ROM. Controlled movement.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">7</span>
+                <div class="left">
+                    <div class="name">Incline DB Curl</div>
+                    <div class="meta">2 × 10 · Rest 90s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">3-second negative. Long head stretch at bottom.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">8</span>
+                <div class="left">
+                    <div class="name">OH Tricep Cable Extension</div>
+                    <div class="meta">2 × 10 · Rest 90s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Stretch at bottom, squeeze at top. Face away from cable.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="zone2-box">
+            <div class="title">🫀 ZONE 2 — 20 min</div>
+            Start within 5–10 min of last set. 133–151 bpm.<br>
+            <strong>Test:</strong> Can hold a conversation but not sing.
+        </div>
+
+        <div class="notes-box">
+            <label>📝 Session Notes</label>
+            <textarea placeholder="Energy, sleep, elbow feel, anything unusual..."></textarea>
+        </div>
+
+    </div><!-- /thu -->
+
+    <!-- ==================== SATURDAY C ==================== -->
+    <div class="workout" id="day-sat">
+
+        <div class="warmup-box">
+            <div class="title">🔥 WARM-UP (do every session)</div>
+            • 5 min light cardio (bike/walk)<br>
+            • 2 × 15 band curls / band pushdowns<br>
+            • 1–2 warm-up sets on first exercise (50% → 70%)
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">1</span>
+                <div class="left">
+                    <div class="name">DB Shoulder Press</div>
+                    <div class="meta">3 × 10 · Rest 2 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Seated or standing. Full ROM — lower to 90°, press to lockout.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">2</span>
+                <div class="left">
+                    <div class="name">Seated Cable Row <span class="new-badge">⭐ NEW</span></div>
+                    <div class="meta">4 × 10 · Rest 2 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Squeeze shoulder blades together at peak contraction. Start LIGHT.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">3</span>
+                <div class="left">
+                    <div class="name">Incline DB Press</div>
+                    <div class="meta">3 × 10 · Rest 2 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">30° incline. Upper chest focus. Control the negative.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">4</span>
+                <div class="left">
+                    <div class="name">Hack Squat</div>
+                    <div class="meta">3 × 10 · Rest 2 min</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Deep ROM. Quads to parallel or below. Controlled descent.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">5</span>
+                <div class="left">
+                    <div class="name">Hammer Curl</div>
+                    <div class="meta">3 × 10 · Rest 90s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Neutral grip = elbow friendly. Don't swing.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">6</span>
+                <div class="left">
+                    <div class="name">Skullcrusher</div>
+                    <div class="meta">3 × 10 · Rest 90s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Lower to forehead, control negative. Keep elbows pointed up.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="10"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">7</span>
+                <div class="left">
+                    <div class="name">Reverse Fly (cable or DB)</div>
+                    <div class="meta">3 × 12 · Rest 60s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Rear delts. Squeeze at peak contraction. Light weight, high feel.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="exercise-card" onclick="toggleCard(this)">
+            <div class="exercise-header">
+                <span class="num">8</span>
+                <div class="left">
+                    <div class="name">Seated Calf Raise</div>
+                    <div class="meta">4 × 12 · Rest 60s</div>
+                </div>
+                <span class="toggle">▼</span>
+            </div>
+            <div class="exercise-body" onclick="event.stopPropagation()">
+                <div class="exercise-note">Full stretch at bottom, pause at top. Slow and controlled.</div>
+                <table class="set-table">
+                    <tr>
+                        <th>SET</th>
+                        <th>WEIGHT (kg)</th>
+                        <th>REPS</th>
+                        <th>✓</th>
+                    </tr>
+                    <tr>
+                        <td class="set-num">1</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">2</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">3</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                    <tr>
+                        <td class="set-num">4</td>
+                        <td><input type="number" class="weight-input" inputmode="decimal" placeholder="kg"></td>
+                        <td><input type="number" inputmode="numeric" placeholder="12"></td>
+                        <td class="check-col"><input type="checkbox"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="zone2-box">
+            <div class="title">🫀 ZONE 2 — 20 min</div>
+            Start within 5–10 min of last set. 133–151 bpm.<br>
+            <strong>Test:</strong> Can hold a conversation but not sing.
+        </div>
+
+        <div class="notes-box">
+            <label>📝 Session Notes</label>
+            <textarea placeholder="Energy, sleep, elbow feel, anything unusual..."></textarea>
+        </div>
+
+    </div><!-- /sat -->
+
+    <script>
+        function switchDay(day) {
+            document.querySelectorAll('.workout').forEach(w => w.classList.remove('active'));
+            document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('day-' + day).classList.add('active');
+            event.target.closest('.day-tab').classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        function toggleCard(card) {
+            if (card.classList.contains('open')) {
+                card.classList.remove('open');
+            } else {
+                card.classList.add('open');
+            }
+        }
+    </script>
+
+</body>
+
+</html>
